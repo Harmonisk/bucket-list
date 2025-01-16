@@ -40,6 +40,10 @@ addButton.addEventListener('click', (event) => {
         isDone: false
     };
 
+    //reset form
+    activityName.value="";
+    activityCategory[0].selected=true;
+
     //add object to bucketlist
     bucketList.push(listItem);
 
