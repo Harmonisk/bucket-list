@@ -25,6 +25,7 @@
       margin-left: 10px;
     }
   </style>
+  <script src="./scripts/script.js" defer></script>
 </head>
 <body>
   <header>
@@ -39,10 +40,11 @@
         <option value="Lärande">Lärande</option>
         <option value="Hobby">Hobby</option>
       </select>
-      <button type="submit">Lägg till</button>
+      <button type="submit" id="add">Lägg till</button>
+      <button type="button" id="remove">Ta bort</button>
     </form>
     <section id="bucketLists"></section>
+    <div id="utskrift"></div>
   </main>
-  <script src="script.js"></script>
 </body>
 </html>
