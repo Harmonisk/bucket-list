@@ -27,7 +27,7 @@ removeButton.addEventListener('click', (event) =>{
     }
 });
 //add button
-addButton.addEventListener('click', (event) => {
+bucketForm.addEventListener('submit', (event) => {
     //prevent refresh
     event.preventDefault();
 
