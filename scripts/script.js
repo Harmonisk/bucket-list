@@ -10,6 +10,16 @@ const utskrift=document.getElementById("utskrift");
 const removeButton=document.getElementById("remove");
 const addButton=document.getElementById("add");
 
+//debug list fill
+bucketList.push(createListItem(activityCategory[0].value, "Japan"));
+bucketList.push(createListItem(activityCategory[1].value, "Fallskärmshoppning"));
+bucketList.push(createListItem(activityCategory[2].value, "Latin"));
+bucketList.push(createListItem(activityCategory[3].value, "Judo"));
+bucketList.push(createListItem(activityCategory[0].value, "Chad"));
+bucketList.push(createListItem(activityCategory[1].value, "Klättra upp för mt. everest"));
+bucketList.push(createListItem(activityCategory[2].value, "Assembler"));
+bucketList.push(createListItem(activityCategory[3].value, "Knyppling"));
+
 //Inital list paint
 writeList();
 
@@ -32,20 +42,11 @@ bucketForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     //create new list item
-    let listItem={
-        id: ++id,
-        category: activityCategory.value,
-        name: activityName.value,
-        isFlaggedForDeletion: false,
-        isDone: false
-    };
+    createListItem(activityCategory.value, activityName.value);
 
     //reset form
     activityName.value="";
     activityCategory[0].selected=true;
-
-    //add object to bucketlist
-    bucketList.push(listItem);
 
     //sort bucketlist
     bucketList.sort((a,b)=>{
@@ -57,6 +58,7 @@ bucketForm.addEventListener('submit', (event) => {
     //redraw bucketlist
     writeList();
 
+    /*
     //add eventlisteners for isDone and isFlaggedForDeletion
     //console.log(document.getElementById(`${id}`));
     let idString=`${id}`;
@@ -69,13 +71,28 @@ bucketForm.addEventListener('submit', (event) => {
             bucketList.filter((li) => {li.id==idNum}).isFlaggedForDeletion=false;
         }
     });
+    */
     
 });
 
 function writeList(){
     //nollställ utskrift
-    utskrift.innerHTML="";
+    utElements=utskrift.querySelectorAll("*");
+    console.log(utElements);
+    utElements.forEach((element) => {
+        element.remove();
+    });
 
+    //Skriv ut element
+    bucketList.forEach((element) => {
+        utskrift.appendChild(element.htmlContainer);
+        let p1=document.createElement('p');
+        p1.innerHTML=element.name;
+        element.htmlContainer.appendChild(p1);
+    });
+
+
+    /*
     //iterera genom bucketList och skriv ut varje objekt via ett divelement
     for(li of bucketList){
         utskrift.innerHTML+=`
@@ -88,5 +105,19 @@ function writeList(){
             <span> ]</span>
         </div>`;
     }
+    */
+}
+
+function createListItem(aCat, aName){
+    return {
+        id: ++id,
+        category: aCat,
+        name: aName,
+        htmlContainer: document.createElement('div'),
+        flaggedLabel: document.createElement('label'),
+        isFlaggedForDeletion: document.createElement('input'),
+        doneLabel: document.createElement('label'),
+        isDone: document.createElement('input')
+    };
 }
 
