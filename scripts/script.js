@@ -19,6 +19,8 @@ bucketList.push(createListItem(activityCategory[0].value, "Chad"));
 bucketList.push(createListItem(activityCategory[1].value, "Klättra upp för mt. everest"));
 bucketList.push(createListItem(activityCategory[2].value, "Assembler"));
 bucketList.push(createListItem(activityCategory[3].value, "Knyppling"));
+sortBucketList();
+
 
 //Inital list paint
 writeList();
@@ -42,18 +44,15 @@ bucketForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     //create new list item
-    createListItem(activityCategory.value, activityName.value);
+    let listItem=createListItem(activityCategory.value, activityName.value);
+
+    //add list item and sort bucketList
+    bucketList.push(listItem);
+    sortBucketList();
 
     //reset form
     activityName.value="";
     activityCategory[0].selected=true;
-
-    //sort bucketlist
-    bucketList.sort((a,b)=>{
-        if (a.category < b.category) return -1;
-        else if(a.category > b.category) return 1;
-        else return 0;
-    });
 
     //redraw bucketlist
     writeList();
@@ -87,7 +86,7 @@ function writeList(){
     bucketList.forEach((element) => {
         utskrift.appendChild(element.htmlContainer);
         let p1=document.createElement('p');
-        p1.innerHTML=element.name;
+        p1.innerHTML=element.name+" "+element.category;
         element.htmlContainer.appendChild(p1);
     });
 
@@ -119,5 +118,14 @@ function createListItem(aCat, aName){
         doneLabel: document.createElement('label'),
         isDone: document.createElement('input')
     };
+}
+
+function sortBucketList(){
+    //sort bucketlist
+    bucketList.sort((a,b)=>{
+        if (a.category < b.category) return -1;
+        //else if(a.category > b.category /*|| a.name>b.name*/) return 1;
+        else return 0;
+    });    
 }
 
