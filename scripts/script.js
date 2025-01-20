@@ -7,7 +7,6 @@ const activityName=document.getElementById("activityName");
 const activityCategory=document.getElementById("activityCategory");
 const bucketForm=document.getElementById("bucketForm");
 const utskrift=document.getElementById("utskrift");
-const removeButton=document.getElementById("remove");
 const addButton=document.getElementById("add");
 
 //debug list fill
@@ -26,7 +25,8 @@ sortBucketList();
 writeList();
 
 //Event Listeners
-//remove button
+
+/*//remove button
 removeButton.addEventListener('click', (event) =>{
     let itemsToDelete=[];
     for(li of bucketList){
@@ -37,7 +37,9 @@ removeButton.addEventListener('click', (event) =>{
     for(li of itemsToDelete){
         bucketList.remove(li);
     }
-});
+});*/
+
+
 //add button
 bucketForm.addEventListener('submit', (event) => {
     //prevent refresh
