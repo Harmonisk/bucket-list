@@ -1,6 +1,8 @@
 //List item collection declarations
 let bucketList=[];
+//console.log(bucketList);
 let id=0;
+fromLocalStorage();
 
 //DOM-object declarations
 const activityName=document.getElementById("activityName");
@@ -10,16 +12,21 @@ const utskrift=document.getElementById("utskrift");
 const addButton=document.getElementById("add");
 
 //debug list fill
-bucketList.push(createListItem(activityCategory[0].value, "Japan"));
-bucketList.push(createListItem(activityCategory[1].value, "Fallskärmshoppning"));
-bucketList.push(createListItem(activityCategory[2].value, "Latin"));
-bucketList.push(createListItem(activityCategory[3].value, "Judo"));
-bucketList.push(createListItem(activityCategory[0].value, "Chad"));
-bucketList.push(createListItem(activityCategory[1].value, "Klättra upp för mt. everest"));
-bucketList.push(createListItem(activityCategory[2].value, "Assembler"));
-bucketList.push(createListItem(activityCategory[3].value, "Knyppling"));
+/*
+createListItem(activityCategory[0].value, "Japan");
+createListItem(activityCategory[1].value, "Fallskärmshoppning");
+createListItem(activityCategory[2].value, "Latin");
+createListItem(activityCategory[3].value, "Judo");
+createListItem(activityCategory[0].value, "Chad");
+createListItem(activityCategory[1].value, "Klättra upp för mt. everest");
+createListItem(activityCategory[2].value, "Assembler");
+createListItem(activityCategory[3].value, "Knyppling");
 sortBucketList();
+toLocalStorage();
+*/
 
+//local storage
+//localStorage.setItem("bucketList", JSON.stringify(bucketList));
 
 //Inital list paint
 writeList();
@@ -46,10 +53,10 @@ bucketForm.addEventListener('submit', (event) => {
     event.preventDefault();
 
     //create new list item
-    let listItem=createListItem(activityCategory.value, activityName.value);
+    createListItem(activityCategory.value, activityName.value);
 
     //add list item and sort bucketList
-    bucketList.push(listItem);
+    //bucketList.push(listItem);
     sortBucketList();
 
     //reset form
@@ -165,10 +172,13 @@ function createListItem(aCat, aName){
         console.log(parentListItem);
         bucketList.splice(bucketList.indexOf(parentListItem), 1);
         //event.target.parentNode.remove();
+        sortBucketList();
+        toLocalStorage();
         writeList();
     });
 
-    return listItem;
+    bucketList.push(listItem);
+    toLocalStorage();
 }
 
 function sortBucketList(){
@@ -180,3 +190,20 @@ function sortBucketList(){
     });    
 }
 
+function toLocalStorage(){
+    sortBucketList();
+    let localBucketList=[];
+    for(li of bucketList){
+        localBucketList.push({category: li.category, name: li.name});
+    }
+    localStorage.setItem("bucketList", JSON.stringify(localBucketList));
+}
+
+function fromLocalStorage(){
+    let localBucketList=JSON.parse(localStorage.getItem("bucketList"));
+    console.log(localBucketList);
+    for(li of localBucketList){
+        console.log("create");
+        createListItem(li.category, li.name);
+    }
+}
