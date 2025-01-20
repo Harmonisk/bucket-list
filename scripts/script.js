@@ -82,8 +82,27 @@ function writeList(){
         element.remove();
     });
 
+    /*//skapa kategorirubriker
+    let resRubrik=document.createElement('h2');
+    resRubrik.innerHTML="Resor";
+    let ävRubrik=document.createElement('h2');
+    ävRubrik.innerHTML="Äventyr";
+    let lärRubrik=document.createElement('h2');
+    rlärRubrik.innerHTML="Lärande";
+    let hobbyRubrik=document.createElement('h2');
+    hobbyRubrik.innerHTML="Resor";
+    */
+
     //Skriv ut element
+    let kategori="";
     bucketList.forEach((element) => {
+        if(element.category!=kategori){
+            console.log("hej");
+            kategori=element.category;
+            let rubrik=document.createElement('h2');
+            rubrik.innerHTML=element.category;
+            utskrift.appendChild(rubrik);
+        }
         utskrift.appendChild(element.htmlContainer);
         let p1=document.createElement('p');
         p1.innerHTML=element.name+" "+element.category;
