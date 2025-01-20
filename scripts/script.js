@@ -104,9 +104,18 @@ function writeList(){
             utskrift.appendChild(rubrik);
         }
         utskrift.appendChild(element.htmlContainer);
-        let p1=document.createElement('p');
-        p1.innerHTML=element.name+" "+element.category;
-        element.htmlContainer.appendChild(p1);
+        let span1=document.createElement('span');
+        span1.innerHTML=element.name+" | ";
+        element.htmlContainer.appendChild(span1);
+        element.isDone.setAttribute('id', `${element.id}isDone`);
+        element.isDone.setAttribute('type', 'checkbox');
+        element.doneLabel.setAttribute('for', `${element.id}isDone`);
+        element.doneLabel.innerHTML="Klar?";
+        element.htmlContainer.appendChild(element.doneLabel);
+        element.htmlContainer.appendChild(element.isDone);
+        //let deleteButton=document.createElement('button');
+        element.deleteButton.innerHTML="Ta Bort";
+        element.htmlContainer.appendChild(element.deleteButton);
     });
 
 
@@ -127,16 +136,37 @@ function writeList(){
 }
 
 function createListItem(aCat, aName){
-    return {
+    let listItem = {
         id: ++id,
         category: aCat,
         name: aName,
         htmlContainer: document.createElement('div'),
-        flaggedLabel: document.createElement('label'),
-        isFlaggedForDeletion: document.createElement('input'),
+        //flaggedLabel: document.createElement('label'),
+        //isFlaggedForDeletion: document.createElement('input'),
+        deleteButton: document.createElement('button'),
         doneLabel: document.createElement('label'),
         isDone: document.createElement('input')
     };
+
+    listItem.deleteButton.setAttribute('class', `${listItem.id}`);
+
+    listItem.deleteButton.addEventListener('click', (event) => {
+        //bucketList.pop(event.target.parentNode.parentNode);
+        //console.log(event.target.parentNode.parentNode);
+        //console.log(bucketList.indexOf(event.target.parentNode.parentNode));
+        //console.log(event.target.getAttribute('class'));
+        //console.log(`${bucketList[0].id}`);
+        //console.log(`${bucketList[0].id}` === event.target.getAttribute('class'));
+        let parentListItem=bucketList.find((element) => 
+            element.id == event.target.getAttribute('class')
+        );
+        console.log(parentListItem);
+        bucketList.splice(bucketList.indexOf(parentListItem), 1);
+        //event.target.parentNode.remove();
+        writeList();
+    });
+
+    return listItem;
 }
 
 function sortBucketList(){
