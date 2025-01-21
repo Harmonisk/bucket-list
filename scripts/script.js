@@ -36,7 +36,6 @@ bucketForm.addEventListener('submit', (event) => {
 function writeList(){
     //reset display element
     utElements=utskrift.querySelectorAll("*");
-    console.log(utElements);
     utElements.forEach((element) => {
         element.remove();
     });
@@ -45,7 +44,6 @@ function writeList(){
     let kategori="";
     bucketList.forEach((element) => {
         if(element.category!=kategori){
-            console.log("hej");
             kategori=element.category;
             let rubrik=document.createElement('h2');
             rubrik.innerHTML=element.category;
@@ -84,7 +82,6 @@ function createListItem(aCat, aName){
         let parentListItem=bucketList.find((element) => 
             element.id == event.target.getAttribute('class')
         );
-        console.log(parentListItem);
         bucketList.splice(bucketList.indexOf(parentListItem), 1);
         sortBucketList();
         toLocalStorage();
@@ -99,8 +96,11 @@ function createListItem(aCat, aName){
 function sortBucketList(){
     //sort bucketlist by category
     bucketList.sort((a,b)=>{
-        if (a.category < b.category) return -1;
-        else return 0;
+        if (a.category === b.category){
+            if(a.name.toUpperCase() < b.name.toUpperCase()) return -1;
+            else return 0;
+        }
+        else if(a.category < b.category) return -1;
     });    
 }
 
@@ -117,20 +117,16 @@ function toLocalStorage(){
 //load bucket list from local storage
 function fromLocalStorage(){
     let localBucketList=JSON.parse(localStorage.getItem("bucketList"));
-    console.log(localBucketList);
     for(li of localBucketList){
-        console.log("create");
         createListItem(li.category, li.name);
     }
 }
 
 //initialize bucket list
 function init(){
-    if(localStorage.getItem("bucketList")){
-        fromLocalStorage();
-    }
-    else{
-        //debug list fill
+    let bucketListFromStorage=localStorage.getItem("bucketList");
+    if(!bucketListFromStorage || JSON.parse(bucketListFromStorage).length===0){
+         //debug list fill
         createListItem(activityCategory[0].value, "Japan");
         createListItem(activityCategory[1].value, "Fallskärmshoppning");
         createListItem(activityCategory[2].value, "Latin");
@@ -141,6 +137,9 @@ function init(){
         createListItem(activityCategory[3].value, "Knyppling");
         sortBucketList();
         toLocalStorage();
+    }
+    else{
+       fromLocalStorage();
     }
     writeList();
 }
