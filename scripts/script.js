@@ -1,62 +1,25 @@
-//List item collection declarations
-let bucketList=[];
-//console.log(bucketList);
-let id=0;
-fromLocalStorage();
+//GLOBAL VARIABLE DECLARATIONS
 
-//DOM-object declarations
+//bucket list and id
+let bucketList=[];
+let id=0;
+
+//global DOM-object declarations
 const activityName=document.getElementById("activityName");
 const activityCategory=document.getElementById("activityCategory");
 const bucketForm=document.getElementById("bucketForm");
 const utskrift=document.getElementById("utskrift");
 const addButton=document.getElementById("add");
 
-//debug list fill
-/*
-createListItem(activityCategory[0].value, "Japan");
-createListItem(activityCategory[1].value, "Fallskärmshoppning");
-createListItem(activityCategory[2].value, "Latin");
-createListItem(activityCategory[3].value, "Judo");
-createListItem(activityCategory[0].value, "Chad");
-createListItem(activityCategory[1].value, "Klättra upp för mt. everest");
-createListItem(activityCategory[2].value, "Assembler");
-createListItem(activityCategory[3].value, "Knyppling");
-sortBucketList();
-toLocalStorage();
-*/
-
-//local storage
-//localStorage.setItem("bucketList", JSON.stringify(bucketList));
-
-//Inital list paint
-writeList();
-
-//Event Listeners
-
-/*//remove button
-removeButton.addEventListener('click', (event) =>{
-    let itemsToDelete=[];
-    for(li of bucketList){
-        if(li.isFlaggedForDeletion){
-            itemsToDelete.add(li);
-        }
-    }
-    for(li of itemsToDelete){
-        bucketList.remove(li);
-    }
-});*/
-
+//GLOBAL EVENT LISTENERS
 
 //add button
 bucketForm.addEventListener('submit', (event) => {
     //prevent refresh
     event.preventDefault();
 
-    //create new list item
+    //create new list item and sort bucketList
     createListItem(activityCategory.value, activityName.value);
-
-    //add list item and sort bucketList
-    //bucketList.push(listItem);
     sortBucketList();
 
     //reset form
@@ -65,44 +28,20 @@ bucketForm.addEventListener('submit', (event) => {
 
     //redraw bucketlist
     writeList();
-
-    /*
-    //add eventlisteners for isDone and isFlaggedForDeletion
-    //console.log(document.getElementById(`${id}`));
-    let idString=`${id}`;
-    let idNum=id;
-    document.getElementById(`${idString}isFlaggedForDeletion`).addEventListener('change', (event) => {
-        if(event.target.checked){
-            bucketList.filter((li) => {li.id==idNum}).isFlaggedForDeletion=true;
-        }
-        else{
-            bucketList.filter((li) => {li.id==idNum}).isFlaggedForDeletion=false;
-        }
-    });
-    */
-    
 });
 
+//GLOBAL FUNCTIONS
+
+//display bucket list in HTML-document
 function writeList(){
-    //nollställ utskrift
+    //reset display element
     utElements=utskrift.querySelectorAll("*");
     console.log(utElements);
     utElements.forEach((element) => {
         element.remove();
     });
 
-    /*//skapa kategorirubriker
-    let resRubrik=document.createElement('h2');
-    resRubrik.innerHTML="Resor";
-    let ävRubrik=document.createElement('h2');
-    ävRubrik.innerHTML="Äventyr";
-    let lärRubrik=document.createElement('h2');
-    rlärRubrik.innerHTML="Lärande";
-    let hobbyRubrik=document.createElement('h2');
-    hobbyRubrik.innerHTML="Resor";
-    */
-
-    //Skriv ut element
+    //add elements to display elements
     let kategori="";
     bucketList.forEach((element) => {
         if(element.category!=kategori){
@@ -122,36 +61,18 @@ function writeList(){
         element.doneLabel.innerHTML="Klar?";
         element.htmlContainer.appendChild(element.doneLabel);
         element.htmlContainer.appendChild(element.isDone);
-        //let deleteButton=document.createElement('button');
         element.deleteButton.innerHTML="Ta Bort";
         element.htmlContainer.appendChild(element.deleteButton);
     });
-
-
-    /*
-    //iterera genom bucketList och skriv ut varje objekt via ett divelement
-    for(li of bucketList){
-        utskrift.innerHTML+=`
-        <div id="${li.id}div">
-            <span>[ Category: ${li.category} | Name: ${li.name}</span>
-            <label for="${li.id}done"> | Klar?: </label>
-            <input type="checkbox" id="${li.id}isDone">
-            <label for="${li.id}isFlaggedForDeletion" > | ta bort: </label>
-            <input type="checkbox" id="${li.id}isFlaggedForDeletion" class="${li.id}">
-            <span> ]</span>
-        </div>`;
-    }
-    */
 }
 
+//create new list item and add it to bucket list
 function createListItem(aCat, aName){
     let listItem = {
         id: ++id,
         category: aCat,
         name: aName,
         htmlContainer: document.createElement('div'),
-        //flaggedLabel: document.createElement('label'),
-        //isFlaggedForDeletion: document.createElement('input'),
         deleteButton: document.createElement('button'),
         doneLabel: document.createElement('label'),
         isDone: document.createElement('input')
@@ -160,18 +81,11 @@ function createListItem(aCat, aName){
     listItem.deleteButton.setAttribute('class', `${listItem.id}`);
 
     listItem.deleteButton.addEventListener('click', (event) => {
-        //bucketList.pop(event.target.parentNode.parentNode);
-        //console.log(event.target.parentNode.parentNode);
-        //console.log(bucketList.indexOf(event.target.parentNode.parentNode));
-        //console.log(event.target.getAttribute('class'));
-        //console.log(`${bucketList[0].id}`);
-        //console.log(`${bucketList[0].id}` === event.target.getAttribute('class'));
         let parentListItem=bucketList.find((element) => 
             element.id == event.target.getAttribute('class')
         );
         console.log(parentListItem);
         bucketList.splice(bucketList.indexOf(parentListItem), 1);
-        //event.target.parentNode.remove();
         sortBucketList();
         toLocalStorage();
         writeList();
@@ -181,15 +95,16 @@ function createListItem(aCat, aName){
     toLocalStorage();
 }
 
+//sort bucket list
 function sortBucketList(){
-    //sort bucketlist
+    //sort bucketlist by category
     bucketList.sort((a,b)=>{
         if (a.category < b.category) return -1;
-        //else if(a.category > b.category /*|| a.name>b.name*/) return 1;
         else return 0;
     });    
 }
 
+//save bucket list to local storage
 function toLocalStorage(){
     sortBucketList();
     let localBucketList=[];
@@ -199,6 +114,7 @@ function toLocalStorage(){
     localStorage.setItem("bucketList", JSON.stringify(localBucketList));
 }
 
+//load bucket list from local storage
 function fromLocalStorage(){
     let localBucketList=JSON.parse(localStorage.getItem("bucketList"));
     console.log(localBucketList);
@@ -207,3 +123,27 @@ function fromLocalStorage(){
         createListItem(li.category, li.name);
     }
 }
+
+//initialize bucket list
+function init(){
+    if(localStorage.getItem("bucketList")){
+        fromLocalStorage();
+    }
+    else{
+        //debug list fill
+        createListItem(activityCategory[0].value, "Japan");
+        createListItem(activityCategory[1].value, "Fallskärmshoppning");
+        createListItem(activityCategory[2].value, "Latin");
+        createListItem(activityCategory[3].value, "Judo");
+        createListItem(activityCategory[0].value, "Chad");
+        createListItem(activityCategory[1].value, "Klättra upp för mt. everest");
+        createListItem(activityCategory[2].value, "Assembler");
+        createListItem(activityCategory[3].value, "Knyppling");
+        sortBucketList();
+        toLocalStorage();
+    }
+    writeList();
+}
+
+//INTIIALIZE BUCKET LIST
+init();
