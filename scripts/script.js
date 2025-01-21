@@ -3,6 +3,7 @@
 //bucket list and id
 let bucketList=[];
 let id=0;
+let editableElement=null;
 
 //global DOM-object declarations
 const activityName=document.getElementById("activityName");
@@ -35,6 +36,7 @@ bucketForm.addEventListener('submit', (event) => {
 //display bucket list in HTML-document
 function writeList(){
     //reset display element
+    deactivateEditMode();
     utElements=utskrift.querySelectorAll("*");
     utElements.forEach((element) => {
         element.remove();
@@ -59,8 +61,10 @@ function writeList(){
         element.doneLabel.innerHTML="Klar?";
         element.htmlContainer.appendChild(element.doneLabel);
         element.htmlContainer.appendChild(element.isDone);
+        element.editButton.innerHTML="Ändra";
         element.deleteButton.innerHTML="Ta Bort";
         element.htmlContainer.appendChild(element.deleteButton);
+        element.htmlContainer.appendChild(element.editButton);
     });
 }
 
@@ -72,11 +76,13 @@ function createListItem(aCat, aName){
         name: aName,
         htmlContainer: document.createElement('div'),
         deleteButton: document.createElement('button'),
+        editButton: document.createElement('button'),
         doneLabel: document.createElement('label'),
         isDone: document.createElement('input')
     };
 
     listItem.deleteButton.setAttribute('class', `${listItem.id}`);
+    listItem.editButton.setAttribute('class', `${listItem.id}`)
 
     listItem.deleteButton.addEventListener('click', (event) => {
         let parentListItem=bucketList.find((element) => 
@@ -86,6 +92,11 @@ function createListItem(aCat, aName){
         sortBucketList();
         toLocalStorage();
         writeList();
+    });
+
+    listItem.editButton.addEventListener('click', (event) => {
+        editableElement=bucketList.find( (li) => event.target.getAttribute("class") == li.id);
+        activatEditMode();
     });
 
     bucketList.push(listItem);
@@ -120,6 +131,22 @@ function fromLocalStorage(){
     for(li of localBucketList){
         createListItem(li.category, li.name);
     }
+}
+
+//activate edit mode for selected element
+function activatEditMode(){
+    let editEl=editableElement;
+    deactivateEditMode();
+    editableElement=editEl;
+    editEl.htmlContainer.setAttribute("style", "background-color:red;");
+}
+
+//deactivate edit mode for all elements
+function deactivateEditMode(){
+    editableElement=null;
+    bucketList.forEach((element) => {
+        element.htmlContainer.setAttribute("style", "");
+    });
 }
 
 //initialize bucket list
