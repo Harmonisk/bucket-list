@@ -1,6 +1,6 @@
 //GLOBAL VARIABLE DECLARATIONS
 
-//bucket list and id
+//global non-DOM-object declarations
 let bucketList=[];
 let id=0;
 let editableElement=null;
@@ -24,7 +24,7 @@ editDone.setAttribute('type','checkbox');
 
 //GLOBAL EVENT LISTENERS
 
-//add button
+//event listener for add button
 bucketForm.addEventListener('submit', (event) => {
     //prevent refresh
     event.preventDefault();
@@ -71,9 +71,10 @@ function writeList(){
         element.remove();
     });
 
-    //add elements to display elements
+    //add elements to display element
     let kategori="";
     bucketList.forEach((element) => {
+        //create heading for each new category and add to display element
         if(element.category!=kategori){
             kategori=element.category;
             let rubrik=document.createElement('h2');
