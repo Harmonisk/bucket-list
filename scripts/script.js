@@ -36,16 +36,29 @@ bucketForm.addEventListener('submit', (event) => {
     //reset form
     activityName.value="";
     activityCategory[0].selected=true;
-    //editCategory=activityCategory.cloneNode();
 
     //redraw bucketlist
     writeList();
 });
 
-//edit category
+//event listener for edit category dropdown menu
 editCategory.addEventListener('change',(event) => {
     editableElement.category=editCategory.value;
 });
+
+//event listener for save button
+confirmButton.addEventListener('click', () => {
+    editableElement.name=editName.value;
+    editableElement.category=editCategory.value;
+    editableElement.isDone.checked=editDone.checked;
+    deactivateEditMode();
+    sortBucketList();
+    toLocalStorage();
+    writeList();
+});
+
+//event listener for cancel button
+cancelButton.addEventListener('click', () => deactivateEditMode());
 
 //GLOBAL FUNCTIONS
 
@@ -68,7 +81,6 @@ function writeList(){
             utskrift.appendChild(rubrik);
         }
         utskrift.appendChild(element.htmlContainer);
-        let span1=document.createElement('span');
         element.nameSpan.innerHTML=element.name+" | ";
         element.htmlContainer.appendChild(element.nameSpan);
         element.isDone.setAttribute('id', `${element.id}isDone`);
@@ -84,7 +96,7 @@ function writeList(){
 }
 
 //create new list item and add it to bucket list
-function createListItem(aCat, aName){
+function createListItem(aCat, aName, iDone=false){
     let listItem = {
         id: ++id,
         category: aCat,
@@ -104,6 +116,7 @@ function createListItem(aCat, aName){
 
     //set list item attributes
     listItem.isDone.setAttribute('type', 'checkbox');
+    listItem.isDone.checked=iDone;
 
     //event listener for delete button
     listItem.deleteButton.addEventListener('click', (event) => {
@@ -122,23 +135,8 @@ function createListItem(aCat, aName){
         activatEditMode();
     });
 
-    //event listener for save button
-    confirmButton.addEventListener('click', () => {
-        editableElement.name=editName.value;
-        editableElement.category=editCategory.value;
-        editableElement.isDone.checked=editDone.checked;
-        deactivateEditMode();
-        writeList();
-    });
-
-    //event listener for cancel button
-    cancelButton.addEventListener('click', () => deactivateEditMode());
-
     //event listener for "is done" checkbox 
     listItem.isDone.addEventListener('change', (event) =>{
-        //if(editableElement!=null)console.log(event.target.getAttribute("class"), `${editableElement.id}`);
-        //console.log(event.target.parentNode);
-        console.log(editableElement);
         if(editableElement===null){
             if(event.target.checked){
                 event.target.disabled=true;
@@ -150,8 +148,8 @@ function createListItem(aCat, aName){
         else if(event.target.checked){
             event.target.disabled=true;
         }
-    } ); 
-
+        toLocalStorage()
+    }); 
     bucketList.push(listItem);
     toLocalStorage();
 }
@@ -173,7 +171,7 @@ function toLocalStorage(){
     sortBucketList();
     let localBucketList=[];
     for(li of bucketList){
-        localBucketList.push({category: li.category, name: li.name});
+        localBucketList.push({category: li.category, name: li.name, isDone: li.isDone.checked});
     }
     localStorage.setItem("bucketList", JSON.stringify(localBucketList));
 }
@@ -182,7 +180,7 @@ function toLocalStorage(){
 function fromLocalStorage(){
     let localBucketList=JSON.parse(localStorage.getItem("bucketList"));
     for(li of localBucketList){
-        createListItem(li.category, li.name);
+        createListItem(li.category, li.name, li.isDone);
     }
 }
 
@@ -198,6 +196,7 @@ function activatEditMode(){
     editableElement.nameSpan.setAttribute('style', 'display:none;');
     editableElement.isDone.setAttribute('style', 'display:none;');
     editName.value=editableElement.name;
+    for(category of editCategory){if(category.value===editableElement.category)category.selected=true;}
     editableElement.htmlContainer.prepend(editCategory);
     editableElement.htmlContainer.prepend(editName);
     editDone.checked=editableElement.isDone.checked;
