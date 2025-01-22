@@ -11,6 +11,16 @@ const activityCategory=document.getElementById("activityCategory");
 const bucketForm=document.getElementById("bucketForm");
 const utskrift=document.getElementById("utskrift");
 const addButton=document.getElementById("add");
+const editName=document.createElement('input');
+const editCategory=activityCategory.cloneNode(true);
+const editDone=document.createElement('input');
+const confirmButton=document.createElement('button');
+const cancelButton=document.createElement('button');
+
+//global DOM-object attribute initializations
+confirmButton.innerHTML="Spara";
+cancelButton.innerHTML="Avbryt";
+editDone.setAttribute('type','checkbox');
 
 //GLOBAL EVENT LISTENERS
 
@@ -26,9 +36,15 @@ bucketForm.addEventListener('submit', (event) => {
     //reset form
     activityName.value="";
     activityCategory[0].selected=true;
+    //editCategory=activityCategory.cloneNode();
 
     //redraw bucketlist
     writeList();
+});
+
+//edit category
+editCategory.addEventListener('change',(event) => {
+    editableElement.category=editCategory.value;
 });
 
 //GLOBAL FUNCTIONS
@@ -53,10 +69,9 @@ function writeList(){
         }
         utskrift.appendChild(element.htmlContainer);
         let span1=document.createElement('span');
-        span1.innerHTML=element.name+" | ";
-        element.htmlContainer.appendChild(span1);
+        element.nameSpan.innerHTML=element.name+" | ";
+        element.htmlContainer.appendChild(element.nameSpan);
         element.isDone.setAttribute('id', `${element.id}isDone`);
-        element.isDone.setAttribute('type', 'checkbox');
         element.doneLabel.setAttribute('for', `${element.id}isDone`);
         element.doneLabel.innerHTML="Klar?";
         element.htmlContainer.appendChild(element.doneLabel);
@@ -75,15 +90,22 @@ function createListItem(aCat, aName){
         category: aCat,
         name: aName,
         htmlContainer: document.createElement('div'),
+        nameSpan: document.createElement('span'),
         deleteButton: document.createElement('button'),
         editButton: document.createElement('button'),
         doneLabel: document.createElement('label'),
         isDone: document.createElement('input')
     };
 
+    //add list item wide identifiers
     listItem.deleteButton.setAttribute('class', `${listItem.id}`);
-    listItem.editButton.setAttribute('class', `${listItem.id}`)
+    listItem.editButton.setAttribute('class', `${listItem.id}`);
+    listItem.isDone.setAttribute('class', `${listItem.id}`);
 
+    //set list item attributes
+    listItem.isDone.setAttribute('type', 'checkbox');
+
+    //event listener for delete button
     listItem.deleteButton.addEventListener('click', (event) => {
         let parentListItem=bucketList.find((element) => 
             element.id == event.target.getAttribute('class')
@@ -94,10 +116,41 @@ function createListItem(aCat, aName){
         writeList();
     });
 
+    //event listener for edit button
     listItem.editButton.addEventListener('click', (event) => {
         editableElement=bucketList.find( (li) => event.target.getAttribute("class") == li.id);
         activatEditMode();
     });
+
+    //event listener for save button
+    confirmButton.addEventListener('click', () => {
+        editableElement.name=editName.value;
+        editableElement.category=editCategory.value;
+        editableElement.isDone.checked=editDone.checked;
+        deactivateEditMode();
+        writeList();
+    });
+
+    //event listener for cancel button
+    cancelButton.addEventListener('click', () => deactivateEditMode());
+
+    //event listener for "is done" checkbox 
+    listItem.isDone.addEventListener('change', (event) =>{
+        //if(editableElement!=null)console.log(event.target.getAttribute("class"), `${editableElement.id}`);
+        //console.log(event.target.parentNode);
+        console.log(editableElement);
+        if(editableElement===null){
+            if(event.target.checked){
+                event.target.disabled=true;
+            }
+        }
+        else if(event.target.getAttribute("class")===`${editableElement.id}`){
+            event.target.disabled=false;
+        }
+        else if(event.target.checked){
+            event.target.disabled=true;
+        }
+    } ); 
 
     bucketList.push(listItem);
     toLocalStorage();
@@ -139,21 +192,43 @@ function activatEditMode(){
     deactivateEditMode();
     editableElement=editEl;
     editEl.htmlContainer.setAttribute("style", "background-color:red;");
+    editEl.isDone.disabled=false;
+    editableElement.deleteButton.setAttribute('style','display:none;');
+    editableElement.editButton.setAttribute('style', 'display:none;');
+    editableElement.nameSpan.setAttribute('style', 'display:none;');
+    editableElement.isDone.setAttribute('style', 'display:none;');
+    editName.value=editableElement.name;
+    editableElement.htmlContainer.prepend(editCategory);
+    editableElement.htmlContainer.prepend(editName);
+    editDone.checked=editableElement.isDone.checked;
+    editableElement.htmlContainer.appendChild(editDone);  
+    editableElement.htmlContainer.appendChild(confirmButton);
+    editableElement.htmlContainer.appendChild(cancelButton);
 }
 
 //deactivate edit mode for all elements
 function deactivateEditMode(){
+    bucketList.forEach((element) => {if(element!=editableElement && element.isDone.checked) element.isDone.disabled=true;})
+    editCategory.remove();
+    editName.remove();
+    confirmButton.remove();
+    cancelButton.remove();
+    editDone.remove();
     editableElement=null;
     bucketList.forEach((element) => {
         element.htmlContainer.setAttribute("style", "");
+        element.deleteButton.setAttribute('style', "");
+        element.editButton.setAttribute('style', "");
+        element.nameSpan.setAttribute('style', "");
+        element.isDone.setAttribute('style', "");
     });
 }
 
 //initialize bucket list
 function init(){
+    //debug placeholder list fill if bucket list in local storage is empty or nonexistent
     let bucketListFromStorage=localStorage.getItem("bucketList");
     if(!bucketListFromStorage || JSON.parse(bucketListFromStorage).length===0){
-         //debug list fill
         createListItem(activityCategory[0].value, "Japan");
         createListItem(activityCategory[1].value, "Fallskärmshoppning");
         createListItem(activityCategory[2].value, "Latin");
@@ -166,6 +241,7 @@ function init(){
         toLocalStorage();
     }
     else{
+       //generate bucketList from locally stored bucket list
        fromLocalStorage();
     }
     writeList();
